@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 
 export default function Cart() {
@@ -15,16 +16,20 @@ export default function Cart() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
-      <h1 className="text-4xl font-bold mb-8">Shopping Cart</h1>
+      <h1 className="text-4xl font-bold mb-8">
+        Shopping Cart
+      </h1>
 
       {cart.length === 0 ? (
-        <p className="text-gray-500 text-lg">Your cart is empty.</p>
+        <p className="text-gray-500 text-lg">
+          Your cart is empty.
+        </p>
       ) : (
         <>
           <div className="space-y-6">
             {cart.map((item) => (
               <div
-                key={item.id}
+                key={item._id}
                 className="flex items-center gap-6 border rounded-xl p-5 shadow"
               >
                 <img
@@ -44,7 +49,7 @@ export default function Cart() {
 
                   <div className="flex items-center gap-3 mt-4">
                     <button
-                      onClick={() => decreaseQuantity(item.id)}
+                      onClick={() => decreaseQuantity(item._id)}
                       className="border rounded px-3 py-1"
                     >
                       -
@@ -55,7 +60,7 @@ export default function Cart() {
                     </span>
 
                     <button
-                      onClick={() => increaseQuantity(item.id)}
+                      onClick={() => increaseQuantity(item._id)}
                       className="border rounded px-3 py-1"
                     >
                       +
@@ -64,7 +69,7 @@ export default function Cart() {
                 </div>
 
                 <button
-                  onClick={() => removeFromCart(item.id)}
+                  onClick={() => removeFromCart(item._id)}
                   className="bg-red-500 text-white px-4 py-2 rounded-lg"
                 >
                   Remove
@@ -78,9 +83,12 @@ export default function Cart() {
               Total: ₹{totalPrice}
             </h2>
 
-            <button className="mt-6 bg-indigo-600 text-white px-8 py-4 rounded-xl">
+            <Link
+              to="/checkout"
+              className="inline-block mt-6 bg-indigo-600 text-white px-8 py-4 rounded-xl hover:bg-indigo-700"
+            >
               Checkout
-            </button>
+            </Link>
           </div>
         </>
       )}

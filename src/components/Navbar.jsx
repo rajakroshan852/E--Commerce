@@ -15,6 +15,7 @@ export default function Navbar() {
   const { cart } = useCart();
   const { user, logout } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
+  const [search, setSearch] = useState("");
 
   const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
 
@@ -31,9 +32,27 @@ export default function Navbar() {
           <input
             type="text"
             placeholder="Search products..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && search.trim()) {
+                window.location.href = `/products?search=${encodeURIComponent(
+                  search.trim(),
+                )}`;
+              }
+            }}
             className="w-full px-5 py-3 outline-none"
           />
-          <button className="p-4">
+          <button
+            onClick={() => {
+              if (search.trim()) {
+                window.location.href = `/products?search=${encodeURIComponent(
+                  search.trim(),
+                )}`;
+              }
+            }}
+            className="p-4"
+          >
             <FiSearch size={20} />
           </button>
         </div>

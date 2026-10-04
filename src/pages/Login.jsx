@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { loginUser } from "../api/authApi";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -9,19 +10,36 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  // const handleLogin = (e) => {
+  //   e.preventDefault();
+
+  //   login(email);
+
+  //   navigate("/");
+  // };
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    login(email);
+    try {
+      const res = await loginUser({
+        email,
+        password,
+      });
 
-    navigate("/");
+      localStorage.setItem("token", res.data.token);
+
+      login(res.data.user);
+
+      alert("Login Successful");
+
+      navigate("/");
+    } catch (error) {
+      alert(error.response?.data?.message || "Login Failed");
+    }
   };
-
   return (
     <div className="max-w-md mx-auto mt-20 p-8 shadow-lg rounded-xl">
-      <h1 className="text-3xl font-bold mb-6 text-center">
-        Login
-      </h1>
+      <h1 className="text-3xl font-bold mb-6 text-center">Login</h1>
 
       <form onSubmit={handleLogin} className="space-y-5">
         <input

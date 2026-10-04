@@ -1,75 +1,104 @@
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import products from "../data/products";
 import { useCart } from "../context/CartContext";
+import { getProductById } from "../api/authApi";
 
 export default function ProductDetails() {
   const { id } = useParams();
   const { addToCart } = useCart();
 
-  const product = products.find((item) => item.id === Number(id));
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const res = await getProductById(id);
+        setProduct(res.data);
+      } catch (error) {
+        console.error("Failed to fetch product:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="text-center mt-20 text-xl">
+        Loading product...
+      </div>
+    );
+  }
 
   if (!product) {
-    return <h1 className="text-center text-3xl mt-20">Product Not Found</h1>;
+    return (
+      <div className="text-center mt-20">
+        <h1 className="text-3xl font-bold">
+          Product not found
+        </h1>
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12 grid md:grid-cols-2 gap-10">
-      {/* Product Image */}
-      <div className="bg-gray-100 rounded-2xl p-8">
-        <img
-          src={product.image}
-          alt={product.name}
-          className="w-full h-[500px] object-contain transition-transform duration-300 hover:scale-110"
-        />
-      </div>
+    <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="grid gap-10 md:grid-cols-2">
 
-      {/* Product Info */}
-      <div>
-        <h1 className="text-5xl font-bold">{product.name}</h1>
+        {/* Product Image */}
+        <div className="flex items-center justify-center rounded-2xl border p-8">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="h-96 w-full object-contain"
+          />
+        </div>
 
-        <p className="text-yellow-500 text-xl mt-4">⭐ {product.rating}</p>
+        {/* Product Information */}
+        <div className="flex flex-col justify-center">
+          <p className="text-indigo-600 font-semibold">
+            {product.category}
+          </p>
 
-        <div className="mt-5 flex items-center gap-4">
-          <span className="text-4xl font-bold text-indigo-600">
+          <h1 className="mt-2 text-4xl font-bold">
+            {product.name}
+          </h1>
+
+          <p className="mt-4 text-yellow-500 text-lg">
+            ⭐ {product.rating}
+          </p>
+
+          <p className="mt-5 text-3xl font-bold text-indigo-600">
             ₹{product.price}
-          </span>
+          </p>
 
-          <span className="text-2xl text-gray-400 line-through">
-            ₹{Math.round(product.price * 1.2)}
-          </span>
+          <p className="mt-6 text-gray-600 leading-7">
+            {product.description}
+          </p>
 
-          <span className="rounded bg-red-500 px-2 py-1 text-sm text-white">
-            20% OFF
-          </span>
-        </div>
+          <p className="mt-5 font-semibold">
+            Stock:{" "}
+            <span className="text-green-600">
+              {product.stock}
+            </span>
+          </p>
 
-        <p className="mt-6 leading-8 text-gray-600">
-          Experience premium quality with elegant design, high performance, and
-          long-lasting durability. Perfect for everyday use.
-        </p>
-
-        <div className="mt-8 flex items-center gap-4">
-          <button className="h-10 w-10 rounded border">-</button>
-
-          <span className="text-xl font-bold">1</span>
-
-          <button className="h-10 w-10 rounded border">+</button>
-        </div>
-        <button className="mt-6 rounded-xl border px-6 py-3 hover:bg-pink-50">
-          ❤️ Add to Wishlist
-        </button>
-        <div className="mt-8 flex gap-4">
           <button
-            onClick={() => addToCart(product)}
-            className="bg-indigo-600 text-white px-8 py-4 rounded-xl"
+            onClick={() => {
+              addToCart(product);
+              alert("Product added to cart!");
+            }}
+            disabled={product.stock <= 0}
+            className="mt-8 rounded-xl bg-indigo-600 px-8 py-4 font-semibold text-white hover:bg-indigo-700 disabled:bg-gray-400"
           >
-            Add To Cart
-          </button>
-
-          <button className="border border-gray-400 px-8 py-4 rounded-xl hover:bg-gray-100">
-            Buy Now
+            {product.stock > 0
+              ? "Add To Cart"
+              : "Out of Stock"}
           </button>
         </div>
+
       </div>
     </div>
   );
